@@ -1,84 +1,307 @@
+* {
+  margin: 0;
+  box-sizing: border-box;
+  padding: 0;
+}
 body {
-  background-color: azure;
   font-family: Arial, Helvetica, sans-serif;
   display: flex;
-  flex-direction: column;
-  margin: auto;
 }
+
+/* header component */
 header {
   overflow: hidden;
   background-color: chocolate;
   height: 5ch;
   color: #ffffff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   position: fixed;
   width: 100%;
-}
-main {
-  height: 100%;
-  background-color: #ffffff;
-  width: 100%;
+  padding: 5px 10px;
   display: flex;
+  flex: 1;
 }
-.sidebar {
+.hd-searchBtn {
+  background: chocolate;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-right: 5px;
+}
+.hd-location {
+  margin-left: 10px;
+  margin-top: 8px;
+  /* background-color: #222; */
+}
+.hd-time {
+  margin-left: 50%;
+  margin-top: 8px;
+}
+.logo {
+  height: 33px;
   width: 10%;
-  background-color: greenyellow;
+  text-align: center;
+  font-size: 30px;
+  font-weight: bold;
+  font-style: italic;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  margin-left: 50px;
+}
+
+/* main/body components */
+.container {
+  color: black;
+  /* background-color: salmon; */
+  width: auto;
+  height: auto;
+  box-sizing: border-box;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Sidebar Component  */
+.sidebar {
   color: #ffffff;
   padding: 5%;
 }
-.container {
-  color: black;
-  padding: 5%;
-  width: 90%;
-  box-sizing: border-box;
+.categories {
+  width: 120%;
+  height: auto;
+  margin-top: 10px;
+  padding: 10px;
 }
+.categoriesBtn {
+  display: flex;
+  font-size: 16px;
+  margin: 5px 0 5px 0;
+  cursor: pointer;
+  background-color: white;
+  width: 100%;
+  padding: 5px;
+  border: none;
+}
+.categoriesBtn:hover {
+  background-color: rgb(224, 148, 93);
+  border: none;
+  border-color: none;
+  color: white;
+}
+.categoriesBtn:active {
+  /* background-color: rgb(224, 148, 93); */
+  background-color: blue;
+  color: white;
+}
+.active {
+  background-color: rgb(224, 148, 93);
+  /* background-color: blue; */
+  color: white;
+}
+.in-active {
+  background-color: white;
+  /* background-color: blue; */
+  /* color: white; */
+}
+
+.hd-categories {
+  color: #222;
+  font-size: 16px;
+  padding: 5px;
+  text-decoration: underline;
+}
+.hd-country {
+  color: #222;
+  font-size: 16px;
+  padding: 5px;
+  text-decoration: none;
+  width: 100%;
+}
+.countries {
+  width: 150%;
+  height: auto;
+  padding: 10px;
+}
+.countries select {
+  width: auto;
+  height: 40px;
+  border: none;
+  font-size: 16px;
+  color: #222;
+  background-color: #eee;
+  border-radius: 5px;
+  padding: 5px 0;
+  outline: none;
+}
+.countries select:hover {
+  color: chocolate;
+}
+.countries select:active {
+  color: whitesmoke !important;
+  background-color: chocolate;
+}
+
+/* Search Component */
+.searchContainer {
+  float: left;
+}
+.searchForm {
+  display: flex;
+}
+.searchForm input {
+  width: 80%;
+  height: 38px;
+  padding: 0px 1rem;
+  font-size: 15px;
+  border: 1px solid #dddddd;
+  outline: none;
+}
+.searchForm button {
+  width: 20%;
+  height: 40px;
+  background: chocolate;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.searchList {
+  line-height: 2;
+}
+.query {
+  padding-bottom: 2rem;
+}
+
+/* loading - ActivityIndicator */
+.loading {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  /* display: inline-block; */
+  background: #222;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px;
+}
+.loading::before {
+  position: absolute;
+  content: '';
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 50%;
+  margin-left: -5px;
+  margin-top: -5px;
+  border: 5px solid transparent;
+  border-top-color: #222;
+  border-bottom-color: #222;
+  animation: spin 0.8s ease-out 0s infinite;
+}
+
+/* Error handler */
+.error {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px;
+}
+
+/* KeyFrames -loading animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg) scale(1.2);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.2);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Card Component */
 .card {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  float: left;
+  column-gap: 5%;
+  width: 100%;
+  justify-content: center;
+  margin-top: 5%;
+  overflow: hidden;
 }
 .cardItem {
   padding: 0 15px;
   color: #110c0c;
-  margin-bottom: 5%;
-  flex: 0 1 28%;
+  /* flex: 0 1 25%; */
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  margin-bottom: 5%;
+  width: 25%;
+  display: block;
 }
 .title {
-  /* display: -webkit-box; */
-  display: flex;
+  display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  margin-top: 5%;
+  margin-bottom: 5%;
+  padding: 2px;
 }
-.description {
-  /* display: -webkit-box; */
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+a {
+  margin-bottom: 20px;
+  float: right;
+  text-decoration: none;
 }
-.source {
-  font-weight: lighter;
+img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
 }
+.image {
+  width: 100%;
+  height: 200px;
+  padding: 0;
+  overflow: hidden !important;
+}
+
+/* Footer Component */
 footer {
-  position: relative;
+  position: fixed;
+  right: 0;
   left: 0;
   bottom: 0;
   width: 100%;
-  background-color: chocolate;
   color: white;
   height: 5ch;
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  opacity: 1; /* Leave this as 1 */
+  background-color: rgba(0, 0, 0, 0.6);
+  overflow: hidden;
 }
 
-@media (max-width: 700px) {
-  main,
-  aside {
-    grid-column: 1 / span 5;
-  }
+/* Media Queries */
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
 }
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (max-width: 992px) {
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+/* @media only screen and (min-width: 600px) {
+} */
+
+/* Medium devices (landscape tablets, 768px and up) */
+/* @media only screen and (min-width: 768px) {
+} */
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+/* @media only screen and (min-width: 1200px) {
+} */

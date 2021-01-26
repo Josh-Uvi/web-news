@@ -1,0 +1,9 @@
+export const placeholderImage = 'https://via.placeholder.com/150';
+export const apiKey = process.env.API_KEY;
+export const apiBaseUrl = process.env.API_ENDPOINT;
+export const searchEndpoint = process.env.API_SEARCH_ENDPOINT;
+export const ipUrl = process.env.IP_ENDPOINT;
+export const page = 1;
+export const category = 'general';
+export const country = 'gb';
+export const endPoint = `${apiBaseUrl}&category=${category}&country=${country}&page_number=${page}&apiKey=${apiKey}`;
