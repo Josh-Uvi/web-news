@@ -60,11 +60,13 @@ const App = () => {
                   <h5 className="title">{post.title}</h5>
                   <img
                     style={{ width: "100%" }}
-                    src={image}
-                    alt="Placeholder image"
+                    src={post.image === "None" ? image : post.image ?? image}
+                    alt="Article image"
                   />
-                  {/* <p className="description">{post.description}</p> */}
+                  <p className="description">{post.description}</p>
                   <p>{formattedTime(post.published)}</p>
+                  {console.log(post)}
+                  <button>...read more</button>
                 </div>
               ))}
           </div>

@@ -40,13 +40,7 @@ module.exports = {
     new MomentLocalesPlugin(),
   ],
   devServer: {
-    contentBase: "./public",
-    hot: true,
-    open: true,
-    host: HOST,
     port: PORT,
-    watchOptions: {
-      poll: true,
-    },
+    host: HOST,
   },
 };
