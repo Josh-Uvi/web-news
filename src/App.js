@@ -65,7 +65,6 @@ const App = () => {
                   />
                   <p className="description">{post.description}</p>
                   <p>{formattedTime(post.published)}</p>
-                  {console.log(post)}
                   <button>...read more</button>
                 </div>
               ))}
