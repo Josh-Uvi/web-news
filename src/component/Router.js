@@ -5,7 +5,7 @@ import Home from "../pages/Home";
 import Blogs from "../pages/Blogs";
 import NoPage from "../pages/NoPage";
 
-export default function Nav() {
+export default function Router() {
   return (
     <BrowserRouter>
       <Routes>

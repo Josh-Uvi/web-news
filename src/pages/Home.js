@@ -1,7 +1,7 @@
-import React from "react";
+import * as React from "react";
 
-const Home = () => {
-  return <h1>Home</h1>;
-};
+import ResponsiveLayout from "./Layout";
 
-export default Home;
+export default function Home() {
+  return <ResponsiveLayout />;
+}

@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "A simple news app built from scratch with react and webpack",
   "main": "./public/entry.js",
+  "engines": {
+    "node": ">=18.19",
+    "npm": ">=10.2"
+  },
   "scripts": {
     "dev": "webpack serve --mode development ",
     "build": "webpack --mode production"
@@ -35,6 +39,7 @@
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.8.1",
     "dotenv-webpack": "^8.0.1",
+    "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.6.0",
     "mini-css-extract-plugin": "^2.7.6",
     "moment-locales-webpack-plugin": "^1.2.0",

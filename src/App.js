@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import "./App.css";
 import categories from "./categories";
 import regions from "./countries.json";
 import moment from "moment";
-import Nav from "./component/Navigation";
+import Router from "./component/Router";
 
 function countries() {
   Object.keys(regions)
@@ -12,7 +11,7 @@ function countries() {
 }
 
 const App = () => {
-  const [data, setData] = useState([]);
+  // const [data, setData] = useState([]);
   // const [isloading, setIsloading] = useState(true);
 
   const image = "https://via.placeholder.com/150";
@@ -76,7 +75,7 @@ const App = () => {
   //   </>
   // );
 
-  return <Nav />;
+  return <Router />;
 };
 
 export default App;
