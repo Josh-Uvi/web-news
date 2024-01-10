@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import categories from "./categories";
-import regions from "./countries.json";
+// import regions from "./countries.json";
 import moment from "moment";
 import Router from "./component/Router";
 

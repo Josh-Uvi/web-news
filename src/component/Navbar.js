@@ -1,6 +1,7 @@
 import React from "react";
-import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import SelectComponent from "./Select";
 
 const drawerWidth = 240;
 
@@ -19,13 +20,15 @@ const Navbar = ({ handleDrawerToggle }) => {
           aria-label="open drawer"
           edge="start"
           onClick={handleDrawerToggle}
+          size="large"
           sx={{ mr: 2, display: { sm: "none" } }}
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" noWrap component="div">
+        <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>
           Web News
         </Typography>
+        <SelectComponent />
       </Toolbar>
     </AppBar>
   );
