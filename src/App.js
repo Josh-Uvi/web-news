@@ -4,6 +4,7 @@ import categories from "./categories";
 import moment from "moment";
 import Router from "./component/Router";
 import { PostContextProvider } from "./hooks/postContext";
+import ThemeContextProvider from "./hooks/themeContext";
 
 const App = () => {
   // const [data, setData] = useState([]);
@@ -71,9 +72,11 @@ const App = () => {
   // );
 
   return (
-    <PostContextProvider>
-      <Router />
-    </PostContextProvider>
+    <ThemeContextProvider>
+      <PostContextProvider>
+        <Router />
+      </PostContextProvider>
+    </ThemeContextProvider>
   );
 };
 

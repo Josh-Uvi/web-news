@@ -48,7 +48,7 @@ const DrawerComponent = () => {
             <ListItem key={article.category} disablePadding className="">
               <ListItemButton
                 key={index}
-                // selected={selectedIndex === article.category ? true : false}
+                selected={context.category == article.category ? true : false}
                 onClick={(e) => {
                   e.preventDefault();
                   context.setUrl(
