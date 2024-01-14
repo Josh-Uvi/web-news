@@ -12,50 +12,70 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+
 import categories from "../categories";
+import { API_ENDPOINT, usePost } from "../hooks/postContext";
 
 const drawerWidth = 240;
 
-const drawer = (
-  <Box sx={{ overflow: "auto" }}>
-    <Toolbar sx={{ backgroundColor: "#1976d2", color: "#fff" }}>
-      <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-        App icon
-      </Typography>
-    </Toolbar>
-    <Divider />
-    <List
-      subheader={
-        <ListSubheader
-          sx={{ fontWeight: "700", fontSize: 16, textTransform: "uppercase" }}
-          component="div"
-          id="nested-list-subheader"
-        >
-          Categories
-        </ListSubheader>
-      }
-    >
-      {categories.sort() &&
-        categories.map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText
-                sx={{ textTransform: "capitalize" }}
-                primary={text}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-    </List>
-  </Box>
-);
+const DrawerComponent = () => {
+  // const [selectedIndex, setSelectedIndex] = useState(5);
 
-const DrawerItem = ({ container, mobileOpen, handleDrawerToggle }) => {
+  const context = usePost();
+
+  return (
+    <Box sx={{ overflow: "auto" }}>
+      <Toolbar sx={{ backgroundColor: "#1976d2", color: "#fff" }}>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          App icon
+        </Typography>
+      </Toolbar>
+      <Divider />
+      <List
+        subheader={
+          <ListSubheader
+            sx={{ fontWeight: "700", fontSize: 16, textTransform: "uppercase" }}
+            component="div"
+            id="nested-list-subheader"
+          >
+            Categories
+          </ListSubheader>
+        }
+      >
+        {Array.from(categories)
+          .sort((a, b) => a.category.localeCompare(b.category))
+          .map((article, index) => (
+            <ListItem key={article.category} disablePadding className="">
+              <ListItemButton
+                key={index}
+                // selected={selectedIndex === article.category ? true : false}
+                onClick={(e) => {
+                  e.preventDefault();
+                  context.setUrl(
+                    `${API_ENDPOINT}${context.country}&category=${article.category}`
+                  );
+                  context.setCategory(article.category);
+                }}
+                sx={{
+                  "&.Mui-selected": {
+                    backgroundColor: "#1976d2",
+                  },
+                }}
+              >
+                <ListItemIcon>{article.icon}</ListItemIcon>
+                <ListItemText
+                  sx={{ textTransform: "capitalize" }}
+                  primary={article.category}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
+      </List>
+    </Box>
+  );
+};
+
+const DrawerItem = ({ mobileOpen, handleDrawerToggle }) => {
   return (
     <Box
       component="nav"
@@ -64,7 +84,6 @@ const DrawerItem = ({ container, mobileOpen, handleDrawerToggle }) => {
     >
       {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
       <Drawer
-        container={container}
         variant="temporary"
         open={mobileOpen}
         onClose={handleDrawerToggle}
@@ -79,7 +98,7 @@ const DrawerItem = ({ container, mobileOpen, handleDrawerToggle }) => {
           },
         }}
       >
-        {drawer}
+        <DrawerComponent />
       </Drawer>
       <Drawer
         variant="permanent"
@@ -92,7 +111,7 @@ const DrawerItem = ({ container, mobileOpen, handleDrawerToggle }) => {
         }}
         open
       >
-        {drawer}
+        <DrawerComponent />
       </Drawer>
     </Box>
   );

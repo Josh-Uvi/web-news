@@ -1,12 +1,11 @@
 import * as React from "react";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import ListItemText from "@mui/material/ListItemText";
 import Select from "@mui/material/Select";
-import regions from "../regions";
-import { Box, Typography } from "@mui/material";
+import { countries } from "../regions";
+import { Box } from "@mui/material";
+import { API_ENDPOINT, usePost } from "../hooks/postContext";
 
 const ITEM_HEIGHT = 40;
 const ITEM_PADDING_TOP = 8;
@@ -20,16 +19,12 @@ const MenuProps = {
 };
 
 export default function SelectComponent() {
-  const [country, setCountry] = React.useState("United Kingdom");
+  const context = usePost();
 
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setCountry(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
+  const handleChange = ({ target }) => {
+    const { value } = target;
+    context.setUrl(`${API_ENDPOINT}${value}&category=${context.category}`);
+    context.setCountry(value);
   };
 
   return (
@@ -44,17 +39,19 @@ export default function SelectComponent() {
       <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
         <Select
           id="demo-simple-select-standard"
-          value={country}
+          value={context.country}
           onChange={handleChange}
           label="Regions"
           MenuProps={MenuProps}
           sx={{ color: "#fff" }}
         >
-          {regions.sort().map((region, index) => (
-            <MenuItem key={index} value={region}>
-              <ListItemText primary={region} />
-            </MenuItem>
-          ))}
+          {Array.from(countries)
+            .sort((a, b) => a.country.localeCompare(b.country))
+            .map((region) => (
+              <MenuItem key={region.key} value={region.key.toLowerCase()}>
+                <ListItemText primary={region.country} />
+              </MenuItem>
+            ))}
         </Select>
       </FormControl>
     </Box>

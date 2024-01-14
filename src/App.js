@@ -3,12 +3,7 @@ import categories from "./categories";
 // import regions from "./countries.json";
 import moment from "moment";
 import Router from "./component/Router";
-
-function countries() {
-  Object.keys(regions)
-    .sort()
-    .map((value, key) => <p key={key}>{value}</p>);
-}
+import { PostContextProvider } from "./hooks/postContext";
 
 const App = () => {
   // const [data, setData] = useState([]);
@@ -75,7 +70,11 @@ const App = () => {
   //   </>
   // );
 
-  return <Router />;
+  return (
+    <PostContextProvider>
+      <Router />
+    </PostContextProvider>
+  );
 };
 
 export default App;
