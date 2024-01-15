@@ -7,35 +7,66 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
 import cardImg from "../assets/background.png";
+import { formatTime } from "../hooks/helpers";
+// import { Link } from "react-router-dom";
 
 export default function MediaCard({ data }) {
   return (
     <Card
       sx={{
-        maxWidth: 345,
+        maxWidth: 380,
         boxShadow: 3,
         borderRadius: 2,
         ":hover": {
           boxShadow: 20,
         },
+        flexGrow: 1,
       }}
     >
       <CardMedia
-        sx={{ height: 200, objectFit: "cover" }}
+        sx={{ objectFit: "cover" }}
         image={data.image === "None" ? cardImg : data.image ?? cardImg}
-        title="green iguana"
+        alt={data.title}
+        height="240"
+        component="img"
       />
       <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
+        <Typography
+          gutterBottom
+          variant="h5"
+          component="div"
+          sx={{
+            display: "-webkit-box",
+            overflow: "hidden",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: 2,
+          }}
+        >
           {data.title}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {data.description}
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            display: "-webkit-box",
+            overflow: "hidden",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: 3,
+          }}
+        >
+          {data.description == "text/plain..." ? null : data.description}
         </Typography>
       </CardContent>
-      <CardActions>
-        <Button size="small">Share</Button>
-        <Button size="small">Read More</Button>
+      <CardActions sx={{ justifyContent: "space-between" }}>
+        <Typography>{formatTime(data.published)}</Typography>
+        <Button
+          href={data.url}
+          size="small"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Read More
+        </Button>
       </CardActions>
     </Card>
   );
