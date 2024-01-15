@@ -5,7 +5,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Select from "@mui/material/Select";
 import { countries } from "../regions";
 import { Box } from "@mui/material";
-import { API_ENDPOINT, usePost } from "../hooks/postContext";
+import { usePost } from "../hooks/postContext";
 
 const ITEM_HEIGHT = 40;
 const ITEM_PADDING_TOP = 8;
@@ -23,7 +23,7 @@ export default function SelectComponent() {
 
   const handleChange = ({ target }) => {
     const { value } = target;
-    context.setUrl(`${API_ENDPOINT}${value}&category=${context.category}`);
+    context.setUrl(`/api?country=${value}&category=${context.category}`);
     context.setCountry(value);
   };
 
@@ -56,25 +56,4 @@ export default function SelectComponent() {
       </FormControl>
     </Box>
   );
-}
-
-{
-  /* <FormControl sx={{ m: 1, width: 300 }}>
-<InputLabel id="demo-multiple-checkbox-label">Regions</InputLabel>
-<Select
-  labelId="demo-multiple-checkbox-label"
-  id="demo-multiple-checkbox"
-  label="Regions"
-  value={personName}
-  onChange={handleChange}
-  input={<OutlinedInput label="Regions" />}
-  MenuProps={MenuProps}
->
-  {regions.sort().map((country, index) => (
-    <MenuItem key={index} value={country}>
-      <ListItemText primary={country} />
-    </MenuItem>
-  ))}
-</Select>
-</FormControl> */
 }

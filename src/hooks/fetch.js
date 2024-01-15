@@ -1,7 +1,6 @@
-import { useEffect, useRef, useReducer } from "react";
+import { useEffect, useReducer } from "react";
 
 export const useFetch = (url) => {
-  const cache = useRef({});
   const localStorage = window.localStorage;
 
   const initialState = {
@@ -23,7 +22,7 @@ export const useFetch = (url) => {
     }
   }, initialState);
 
-  let cacheData = initialState.data;
+  let cacheData;
 
   useEffect(() => {
     let cancelRequest = false;
@@ -31,17 +30,14 @@ export const useFetch = (url) => {
 
     const fetchData = async () => {
       dispatch({ type: "FETCHING" });
-      if (cacheData !== null && cache.current[url]) {
-        // const data = cache.current[url];
-        const getItem = localStorage.getItem("@cacheData");
-        cacheData = JSON.parse(getItem);
+      if (cacheData) {
+        cacheData = JSON.parse(localStorage.getItem(url));
         dispatch({ type: "FETCHED", payload: cacheData });
       } else {
         try {
           const response = await fetch(url);
           const data = await response.json();
-          cache.current[url] = data;
-          cacheData = localStorage.setItem("@cacheData", JSON.stringify(data));
+          cacheData = localStorage.setItem(url, JSON.stringify(data));
           if (cancelRequest) return;
           dispatch({ type: "FETCHED", payload: data });
         } catch (error) {

@@ -12,4 +12,13 @@ const useLocalStorage = (storageKey, fallbackState) => {
   return [value, setValue];
 };
 
+export const formatTime = (date) => {
+  const newDate = new Date(date).toISOString();
+  const newTime = moment(newDate).fromNow();
+  return newTime;
+};
+
+export const sortList = (list) =>
+  list.sort((a, b) => new Date(b.published) - new Date(a.published));
+
 export default useLocalStorage;

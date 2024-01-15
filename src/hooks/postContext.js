@@ -1,8 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import useLocalStorage from "./localStorage";
-
-const apiKey = process.env.API_KEY;
-export const API_ENDPOINT = `https://api.currentsapi.services/v1/latest-news?apiKey=${apiKey}&country=`;
+import useLocalStorage from "./helpers";
 
 const PostContext = createContext();
 
@@ -14,7 +11,7 @@ export function PostContextProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({});
   const [url, setUrl] = useState(
-    `${API_ENDPOINT}${country}&category=${category}`
+    `/api?country=${country}&category=${category}`
   );
 
   useEffect(() => {

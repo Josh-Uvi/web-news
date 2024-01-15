@@ -8,6 +8,19 @@ export default function ThemeContextProvider({ children }) {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
   const [mode, setMode] = useState(prefersDarkMode ? "dark" : "light");
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const toggleDrawer = (event) => {
+    if (
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+
+    setMobileOpen(!mobileOpen);
+  };
+
   const colorMode = useMemo(
     () => ({
       toggleColorMode: () => {
@@ -21,7 +34,7 @@ export default function ThemeContextProvider({ children }) {
     () =>
       createTheme({
         palette: {
-          mode,
+          mode: mode,
         },
       }),
     [mode]
@@ -32,7 +45,9 @@ export default function ThemeContextProvider({ children }) {
   }, [prefersDarkMode]);
 
   return (
-    <ThemeContext.Provider value={colorMode}>
+    <ThemeContext.Provider
+      value={{ colorMode, mobileOpen, toggleDrawer, mode }}
+    >
       <ThemeProvider theme={theme}>{children}</ThemeProvider>
     </ThemeContext.Provider>
   );

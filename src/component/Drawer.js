@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Box,
   Divider,
@@ -11,21 +11,28 @@ import {
   ListSubheader,
   Toolbar,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 import categories from "../categories";
 import { API_ENDPOINT, usePost } from "../hooks/postContext";
+import { ThemeContext } from "../hooks/themeContext";
 
 const drawerWidth = 240;
 
 const DrawerComponent = () => {
-  // const [selectedIndex, setSelectedIndex] = useState(5);
-
   const context = usePost();
-
+  const theme = useTheme();
   return (
     <Box sx={{ overflow: "auto" }}>
-      <Toolbar sx={{ backgroundColor: "#1976d2", color: "#fff" }}>
+      <Toolbar
+        sx={{
+          backgroundColor:
+            theme.palette.mode === "light" ? "#1976d2" : "#272727",
+          color: "#fff",
+        }}
+      >
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           App icon
         </Typography>
@@ -52,7 +59,7 @@ const DrawerComponent = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   context.setUrl(
-                    `${API_ENDPOINT}${context.country}&category=${article.category}`
+                    `/api?country=${context.country}&category=${article.category}`
                   );
                   context.setCategory(article.category);
                 }}
@@ -75,7 +82,11 @@ const DrawerComponent = () => {
   );
 };
 
-const DrawerItem = ({ mobileOpen, handleDrawerToggle }) => {
+const DrawerItem = () => {
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.down("sm"));
+  const { mobileOpen, toggleDrawer } = useContext(ThemeContext);
+
   return (
     <Box
       component="nav"
@@ -83,36 +94,39 @@ const DrawerItem = ({ mobileOpen, handleDrawerToggle }) => {
       aria-label="mailbox folders"
     >
       {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={handleDrawerToggle}
-        ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
-        }}
-        sx={{
-          display: { xs: "block", sm: "none" },
-          "& .MuiDrawer-paper": {
-            boxSizing: "border-box",
-            width: drawerWidth,
-          },
-        }}
-      >
-        <DrawerComponent />
-      </Drawer>
-      <Drawer
-        variant="permanent"
-        sx={{
-          display: { xs: "none", sm: "block" },
-          "& .MuiDrawer-paper": {
-            boxSizing: "border-box",
-            width: drawerWidth,
-          },
-        }}
-        open
-      >
-        <DrawerComponent />
-      </Drawer>
+      {matches ? (
+        <Drawer
+          variant={"temporary"}
+          open={mobileOpen}
+          onClose={toggleDrawer}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
+          }}
+        >
+          <DrawerComponent />
+        </Drawer>
+      ) : (
+        <Drawer
+          variant={"permanent"}
+          sx={{
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
+          }}
+          open
+        >
+          <DrawerComponent />
+        </Drawer>
+      )}
     </Box>
   );
 };

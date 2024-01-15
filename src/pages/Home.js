@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -11,23 +11,13 @@ import DrawerItem from "../component/Drawer";
 import { usePost } from "../hooks/postContext";
 
 function Home() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
   const { error, loading, data } = usePost();
-
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <Navbar handleDrawerToggle={handleDrawerToggle} />
-      <DrawerItem
-        handleDrawerToggle={handleDrawerToggle}
-        mobileOpen={mobileOpen}
-      />
-      <Box component="main" sx={{ flexGrow: 1, p: 6, mt: 8 }}>
+      <Navbar />
+      <DrawerItem />
+      <Box component="main" sx={{ flexGrow: 1, p: 3.5, mt: 7 }}>
         {error && (
           <Typography variant="body2" color="text.secondary">
             {error.message}

@@ -10,14 +10,15 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 
+// local imports
 import SelectComponent from "./Select";
 import { ThemeContext } from "../hooks/themeContext";
 
 const drawerWidth = 240;
 
-const Navbar = ({ handleDrawerToggle }) => {
+const Navbar = () => {
   const theme = useTheme();
-  const colorMode = useContext(ThemeContext);
+  const { colorMode, toggleDrawer } = useContext(ThemeContext);
 
   return (
     <AppBar
@@ -32,7 +33,7 @@ const Navbar = ({ handleDrawerToggle }) => {
           color="inherit"
           aria-label="open drawer"
           edge="start"
-          onClick={handleDrawerToggle}
+          onClick={toggleDrawer}
           size="large"
           sx={{ mr: 2, display: { sm: "none" } }}
         >
