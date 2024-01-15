@@ -9,10 +9,11 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const PORT = process.env.PORT || 4000;
 const HOST = process.env.HOST || "localhost";
-const apiKey = process.env.CURRENT_API_KEY;
+const apiKey = process.env.API_KEY;
+const apiUrl = process.env.API_URL;
 
 const apiProxy = createProxyMiddleware({
-  target: `https://api.currentsapi.services/v1/latest-news?`,
+  target: apiUrl,
   changeOrigin: true,
   pathRewrite(_, req) {
     let url = req.originalUrl;

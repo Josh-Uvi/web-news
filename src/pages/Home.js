@@ -7,7 +7,7 @@ import { Grid, Typography } from "@mui/material";
 // local imports
 import MediaCard from "../component/Card";
 import Navbar from "../component/Navbar";
-import DrawerItem from "../component/Drawer";
+import DrawerComponent from "../component/Drawer";
 import { usePost } from "../hooks/postContext";
 
 function Home() {
@@ -16,7 +16,7 @@ function Home() {
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <Navbar />
-      <DrawerItem />
+      <DrawerComponent />
       <Box component="main" sx={{ flexGrow: 1, p: 3.5, mt: 7 }}>
         {error && (
           <Typography variant="body2" color="text.secondary">
