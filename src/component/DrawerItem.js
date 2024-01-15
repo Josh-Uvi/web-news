@@ -13,6 +13,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
+import StreetviewOutlinedIcon from "@mui/icons-material/StreetviewOutlined";
 
 import categories from "../categories";
 
@@ -28,9 +29,7 @@ const DrawerItem = () => {
           color: "#fff",
         }}
       >
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          App icon
-        </Typography>
+        <StreetviewOutlinedIcon fontSize="large" />
       </Toolbar>
       <Divider />
       <List

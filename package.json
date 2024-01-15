@@ -1,7 +1,7 @@
 {
-  "name": "setup-react",
+  "name": "uvi-news",
   "version": "1.0.0",
-  "description": "A simple news app built from scratch with react and webpack",
+  "description": "A news aggregator app built from scratch with react and webpack",
   "main": "./public/entry.js",
   "engines": {
     "node": ">=18.19",
