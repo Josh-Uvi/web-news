@@ -46,16 +46,18 @@ const DrawerItem = () => {
         {Array.from(categories)
           .sort((a, b) => a.category.localeCompare(b.category))
           .map((article, index) => (
-            <ListItem key={article.category} disablePadding className="">
+            <ListItem key={article.category} disablePadding>
               <ListItemButton
                 key={index}
                 selected={context.category == article.category ? true : false}
                 onClick={(e) => {
                   e.preventDefault();
-                  context.setUrl(
-                    `/api?country=${context.country}&category=${article.category}`
-                  );
                   context.setCategory(article.category);
+                  const apiUrl =
+                    process.env.NODE_ENV !== "production"
+                      ? `/api/news?country=${context.country}&category=${article.category}`
+                      : `/.netlify/functions/api/news?country=${context.country}&category=${article.category}`;
+                  context.setUrl(apiUrl);
                 }}
                 sx={{
                   "&.Mui-selected": {

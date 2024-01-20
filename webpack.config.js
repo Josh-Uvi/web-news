@@ -9,23 +9,36 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const PORT = process.env.PORT || 4000;
 const HOST = process.env.HOST || "localhost";
-const apiKey = process.env.API_KEY;
-const apiUrl = process.env.API_URL;
+// const apiKey = process.env.API_KEY;
+// const apiUrl = process.env.API_URL;
+
+// const apiProxy = createProxyMiddleware({
+//   target: apiUrl,
+//   changeOrigin: true,
+//   pathRewrite(_, req) {
+//     let url = req.originalUrl;
+//     url = Object.entries(req.query).reduce(
+//       (newUrl, [key, value]) => `${newUrl}&${key}=${encodeURI(value)}`,
+//       url
+//     );
+//     return url;
+//   },
+//   headers: {
+//     Authorization: apiKey,
+//   },
+// });
+
+const simpleRequestLogger = (proxyServer, options) => {
+  proxyServer.on("proxyReq", (proxyReq, req, res) => {
+    console.log(`[HPM] [${req.method}] ${req.url}`); // outputs: [HPM] GET /users
+  });
+};
 
 const apiProxy = createProxyMiddleware({
-  target: apiUrl,
+  target: "http://localhost:8888/api/",
   changeOrigin: true,
-  pathRewrite(_, req) {
-    let url = req.originalUrl;
-    url = Object.entries(req.query).reduce(
-      (newUrl, [key, value]) => `${newUrl}&${key}=${encodeURI(value)}`,
-      url
-    );
-    return url;
-  },
-  headers: {
-    Authorization: apiKey,
-  },
+  pathRewrite: { "^/\\.netlify/functions": "" },
+  plugins: [simpleRequestLogger],
 });
 
 module.exports = {
