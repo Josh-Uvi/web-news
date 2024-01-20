@@ -6,14 +6,16 @@ const PostContext = createContext();
 export function PostContextProvider({ children }) {
   const [category, setCategory] = useLocalStorage("@category", "general");
   const [country, setCountry] = useLocalStorage("@country", "gb");
-  const apiUrl =
-    process.env.NODE_ENV !== "production"
-      ? `/api/news?country=${country}&category=${category}`
-      : `/.netlify/functions/api/news?country=${country}&category=${category}`;
+  // const apiUrl =
+  //   process.env.NODE_ENV !== "production"
+  //     ? `/api/news?country=${country}&category=${category}`
+  //     : `/.netlify/functions/api/news?country=${country}&category=${category}`;
   const [data, setData] = useState({ articles: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({});
-  const [url, setUrl] = useState(apiUrl);
+  const [url, setUrl] = useState(
+    `/api/news?country=${country}&category=${category}`
+  );
 
   useEffect(() => {
     const fetchData = async () => {

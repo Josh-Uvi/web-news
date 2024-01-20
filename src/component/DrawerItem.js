@@ -53,11 +53,14 @@ const DrawerItem = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   context.setCategory(article.category);
-                  const apiUrl =
-                    process.env.NODE_ENV !== "production"
-                      ? `/api/news?country=${context.country}&category=${article.category}`
-                      : `/.netlify/functions/api/news?country=${context.country}&category=${article.category}`;
-                  context.setUrl(apiUrl);
+                  // const apiUrl =
+                  //   process.env.NODE_ENV !== "production"
+                  //     ? `/api/news?country=${context.country}&category=${article.category}`
+                  //     : `/.netlify/functions/api/news?country=${context.country}&category=${article.category}`;
+
+                  context.setUrl(
+                    `/api/news?country=${context.country}&category=${article.category}`
+                  );
                 }}
                 sx={{
                   "&.Mui-selected": {
