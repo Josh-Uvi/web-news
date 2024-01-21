@@ -11,7 +11,6 @@ import {
   ListItemText,
   ListSubheader,
   Toolbar,
-  Typography,
 } from "@mui/material";
 import StreetviewOutlinedIcon from "@mui/icons-material/StreetviewOutlined";
 
@@ -50,17 +49,14 @@ const DrawerItem = () => {
               <ListItemButton
                 key={index}
                 selected={context.category == article.category ? true : false}
-                onClick={(e) => {
-                  e.preventDefault();
+                onClick={(event) => {
+                  event.preventDefault();
                   context.setCategory(article.category);
-                  // const apiUrl =
-                  //   process.env.NODE_ENV !== "production"
-                  //     ? `/api/news?country=${context.country}&category=${article.category}`
-                  //     : `/.netlify/functions/api/news?country=${context.country}&category=${article.category}`;
-
-                  context.setUrl(
-                    `/api/news?country=${context.country}&category=${article.category}`
-                  );
+                  const apiUrl =
+                    process.env.NODE_ENV !== "production"
+                      ? `/api?country=${context.country}&category=${article.category}`
+                      : `/api/news?country=${context.country}&category=${article.category}`;
+                  context.setUrl(apiUrl);
                 }}
                 sx={{
                   "&.Mui-selected": {

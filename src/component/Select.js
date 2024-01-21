@@ -23,12 +23,11 @@ export default function SelectComponent() {
 
   const handleChange = ({ target }) => {
     const { value } = target;
-    // const apiUrl =
-    //   process.env.NODE_ENV !== "production"
-    //     ? `/api/news?country=${value}&category=${context.category}`
-    //     : `/.netlify/functions/api/news?country=${value}&category=${context.category}`;
-    // context.setUrl(`/api?country=${value}&category=${context.category}`);
-    context.setUrl(`/api/news?country=${value}&category=${context.category}`);
+    const apiUrl =
+      process.env.NODE_ENV !== "production"
+        ? `/api?country=${value}&category=${context.category}`
+        : `/api/news?country=${value}&category=${context.category}`;
+    context.setUrl(apiUrl);
     context.setCountry(value);
   };
 

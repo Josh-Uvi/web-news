@@ -6,16 +6,14 @@ const PostContext = createContext();
 export function PostContextProvider({ children }) {
   const [category, setCategory] = useLocalStorage("@category", "general");
   const [country, setCountry] = useLocalStorage("@country", "gb");
-  // const apiUrl =
-  //   process.env.NODE_ENV !== "production"
-  //     ? `/api/news?country=${country}&category=${category}`
-  //     : `/.netlify/functions/api/news?country=${country}&category=${category}`;
   const [data, setData] = useState({ articles: [] });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState({});
-  const [url, setUrl] = useState(
-    `/api/news?country=${country}&category=${category}`
-  );
+  const [error, setError] = useState();
+  const apiUrl =
+    process.env.NODE_ENV !== "production"
+      ? `/api?country=${country}&category=${category}`
+      : `/api/news?country=${country}&category=${category}`;
+  const [url, setUrl] = useState(apiUrl);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,14 +24,19 @@ export function PostContextProvider({ children }) {
 
       if (cachedResult) {
         result = cachedResult;
+        setData({ articles: result.news });
       } else {
-        const response = await fetch(url);
-        result = await response.json();
-        localStorage.setItem(url, JSON.stringify(result));
+        try {
+          const response = await fetch(url);
+          result = await response.json();
+          console.log("data: ", result);
+          localStorage.setItem(url, JSON.stringify(result));
+          setData({ articles: result.news });
+          setLoading(false);
+        } catch (error) {
+          setError(error.message);
+        }
       }
-
-      setData({ articles: result.news });
-      setLoading(false);
     };
 
     fetchData();

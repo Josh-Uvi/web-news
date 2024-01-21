@@ -4,8 +4,6 @@ import fetch from "node-fetch";
 
 const api = express();
 const router = Router();
-
-const helloProxy = (req, res) => res.send("Hello World!");
 const newsProxy = async (req, res, next) => {
   const apiKey = process.env.API_KEY;
   const apiUrl = process.env.API_URL;
@@ -31,7 +29,6 @@ const newsProxy = async (req, res, next) => {
 };
 
 router.get("/news", newsProxy);
-router.get("/hello", helloProxy);
 
 api.use("/api/", router);
 
