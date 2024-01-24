@@ -5,9 +5,9 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 
 // local imports
-import MediaCard from "../component/Card";
-import Navbar from "../component/Navbar";
-import DrawerComponent from "../component/Drawer";
+import MediaCard from "../components/Card";
+import Navbar from "../components/Navbar";
+import DrawerComponent from "../components/Drawer";
 import { usePost } from "../hooks/postContext";
 
 function Home() {

@@ -13,11 +13,6 @@
   status = 200
   to = "/.netlify/functions/api/:splat"
 
-[[headers]]
-  for = "/dist/*"
-  [headers.values]
-  "Cache-Control" = "public, max-age=31536000, s-maxage=31536000"
-
 [[plugins]]
   package = "@netlify/plugin-lighthouse"
 

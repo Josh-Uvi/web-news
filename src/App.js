@@ -1,8 +1,7 @@
 import React from "react";
-import Router from "./component/Router";
 import { PostContextProvider } from "./hooks/postContext";
 import ThemeContextProvider from "./hooks/themeContext";
-
+import Router from "./components/Router";
 const App = () => {
   return (
     <ThemeContextProvider>

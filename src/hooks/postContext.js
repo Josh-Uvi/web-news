@@ -1,5 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import useLocalStorage from "./helpers";
+import useLocalStorage, {
+  getWithExpiry,
+  removeAllItemsWithExpiry,
+  setWithExpiry,
+} from "./helpers";
 
 const PostContext = createContext();
 
@@ -18,28 +22,43 @@ export function PostContextProvider({ children }) {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const cachedResult = JSON.parse(localStorage.getItem(url));
+      const cachedResult = getWithExpiry(url);
 
-      let result;
-
-      if (cachedResult) {
-        result = cachedResult;
-        setData({ articles: result.news });
-      } else {
-        try {
-          const response = await fetch(url);
-          result = await response.json();
-          console.log("data: ", result);
-          localStorage.setItem(url, JSON.stringify(result));
-          setData({ articles: result.news });
+      try {
+        if (cachedResult) {
+          setData({ articles: cachedResult });
           setLoading(false);
-        } catch (error) {
-          setError(error.message);
+        } else {
+          const req = await fetch(url);
+          const res = await req.json();
+          setData({ articles: res.news });
+          setWithExpiry(url, res.news, 10000); // 1770000
+          setLoading(false);
         }
+      } catch (error) {
+        setLoading(false);
+        setError(error.message);
       }
+      setLoading(false);
     };
 
     fetchData();
+
+    //  Periodically refresh current cache(url) after ttl
+    const refreshStore = setInterval(() => {
+      fetchData();
+    }, 1800000); //   30mins
+
+    // Periodically remove all cache(url) with ttl
+    const resetStore = setInterval(() => {
+      removeAllItemsWithExpiry();
+      fetchData();
+    }, 43200000); // 12hrs
+
+    return () => {
+      clearInterval(refreshStore);
+      clearInterval(resetStore);
+    };
   }, [url]);
 
   return (

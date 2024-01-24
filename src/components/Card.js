@@ -8,7 +8,6 @@ import Typography from "@mui/material/Typography";
 
 import cardImg from "../assets/background.png";
 import { formatTime } from "../hooks/helpers";
-// import { Link } from "react-router-dom";
 
 export default function MediaCard({ data }) {
   return (
