@@ -1,13 +1,18 @@
 import React, { createContext, useEffect, useMemo, useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
+import useLocalStorage from "./helpers";
 
 export const ThemeContext = createContext({ toggleColorMode: () => {} });
 
 export default function ThemeContextProvider({ children }) {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
-  const [mode, setMode] = useState(prefersDarkMode ? "dark" : "light");
+  const currentTheme = prefersDarkMode ? "dark" : "light";
+
+  const [localTheme, setLocalTheme] = useLocalStorage("@theme", currentTheme);
+
+  const [mode, setMode] = useState(localTheme);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const toggleDrawer = (event) => {
@@ -24,7 +29,7 @@ export default function ThemeContextProvider({ children }) {
   const colorMode = useMemo(
     () => ({
       toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+        setLocalTheme((prevMode) => (prevMode === "light" ? "dark" : "light"));
       },
     }),
     []
@@ -41,8 +46,8 @@ export default function ThemeContextProvider({ children }) {
   );
 
   useEffect(() => {
-    setMode(prefersDarkMode ? "dark" : "light");
-  }, [prefersDarkMode]);
+    setMode(localTheme);
+  }, [localTheme]);
 
   return (
     <ThemeContext.Provider

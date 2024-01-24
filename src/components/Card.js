@@ -13,14 +13,17 @@ export default function MediaCard({ data }) {
   return (
     <Card
       sx={{
-        maxWidth: 380,
+        maxWidth: "20vw",
+        height: "100%",
         boxShadow: 3,
         borderRadius: 2,
         ":hover": {
           boxShadow: 20,
         },
-        flexGrow: 1,
       }}
+      orientation="vertical"
+      size="lg"
+      variant="soft"
     >
       <CardMedia
         sx={{ objectFit: "cover" }}
@@ -56,7 +59,7 @@ export default function MediaCard({ data }) {
           {data.description == "text/plain..." ? null : data.description}
         </Typography>
       </CardContent>
-      <CardActions sx={{ justifyContent: "space-between" }}>
+      <CardActions sx={{ justifyContent: "space-between", px: 2 }}>
         <Typography>{formatTime(data.published)}</Typography>
         <Button
           href={data.url}
