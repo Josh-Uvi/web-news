@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext } from "react";
 import useLocalStorage from "./helpers";
 import { useQuery } from "@tanstack/react-query";
 
@@ -13,7 +13,7 @@ export function PostContextProvider({ children }) {
       : `/api/news?country=${country}&category=${category}`;
 
   const { isPending, isError, data, error } = useQuery({
-    queryKey: ["@articles", { country, category }],
+    queryKey: ["@news", { country, category }],
     queryFn: async () => {
       const req = await fetch(url);
       const res = await req.json();
