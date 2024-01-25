@@ -42,8 +42,14 @@ function Home() {
             </Typography>
           )}
           {loading && (
-            <Box sx={{ display: "flex" }}>
-              <CircularProgress />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CircularProgress size={50} />
             </Box>
           )}
           {data && (
@@ -54,7 +60,7 @@ function Home() {
               justifyContent="space-evenly"
             >
               {Array.from(data.articles).map((article, index) => (
-                <Grid item xs={6} sm={6} md={2} key={index} py={2}>
+                <Grid item xs={4} sm={4} md={2} key={index} py={2}>
                   <MediaCard data={article} />
                 </Grid>
               ))}

@@ -13,7 +13,7 @@ export default function MediaCard({ data }) {
   return (
     <Card
       sx={{
-        maxWidth: "20vw",
+        minWidth: "20vw",
         height: "100%",
         boxShadow: 3,
         borderRadius: 2,
