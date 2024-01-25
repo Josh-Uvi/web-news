@@ -23,11 +23,6 @@ export default function SelectComponent() {
 
   const handleChange = ({ target }) => {
     const { value } = target;
-    const apiUrl =
-      process.env.NODE_ENV !== "production"
-        ? `/api?country=${value}&category=${context.category}`
-        : `/api/news?country=${value}&category=${context.category}`;
-    context.setUrl(apiUrl);
     context.setCountry(value);
   };
 

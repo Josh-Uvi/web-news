@@ -52,11 +52,6 @@ const DrawerItem = () => {
                 onClick={(event) => {
                   event.preventDefault();
                   context.setCategory(article.category);
-                  const apiUrl =
-                    process.env.NODE_ENV !== "production"
-                      ? `/api?country=${context.country}&category=${article.category}`
-                      : `/api/news?country=${context.country}&category=${article.category}`;
-                  context.setUrl(apiUrl);
                 }}
                 sx={{
                   "&.Mui-selected": {

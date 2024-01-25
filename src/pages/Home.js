@@ -12,7 +12,7 @@ import { usePost } from "../hooks/postContext";
 import Footer from "../components/Footer";
 
 function Home() {
-  const { error, loading, data } = usePost();
+  const { error, loading, data, isError } = usePost();
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down("sm"));
   return (
@@ -36,7 +36,7 @@ function Home() {
           }}
           minWidth="sm"
         >
-          {error && (
+          {isError && (
             <Typography variant="body2" color="text.secondary">
               {error.message}
             </Typography>
@@ -59,7 +59,7 @@ function Home() {
               columns={{ xs: 4, sm: 8, md: 6 }}
               justifyContent="space-evenly"
             >
-              {Array.from(data.articles).map((article, index) => (
+              {Array.from(data).map((article, index) => (
                 <Grid item xs={4} sm={4} md={2} key={index} py={2}>
                   <MediaCard data={article} />
                 </Grid>

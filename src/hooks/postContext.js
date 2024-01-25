@@ -1,80 +1,40 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import useLocalStorage, {
-  getWithExpiry,
-  removeAllItemsWithExpiry,
-  setWithExpiry,
-} from "./helpers";
+import React, { createContext, useContext, useState } from "react";
+import useLocalStorage from "./helpers";
+import { useQuery } from "@tanstack/react-query";
 
 const PostContext = createContext();
 
 export function PostContextProvider({ children }) {
   const [category, setCategory] = useLocalStorage("@category", "general");
   const [country, setCountry] = useLocalStorage("@country", "gb");
-  const [data, setData] = useState({ articles: [] });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState();
-  const apiUrl =
+  const url =
     process.env.NODE_ENV !== "production"
       ? `/api?country=${country}&category=${category}`
       : `/api/news?country=${country}&category=${category}`;
-  const [url, setUrl] = useState(apiUrl);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const cachedResult = getWithExpiry(url);
-
-      try {
-        if (cachedResult) {
-          setData({ articles: cachedResult });
-          setLoading(false);
-        } else {
-          const req = await fetch(url);
-          const res = await req.json();
-          setData({ articles: res.news });
-          setWithExpiry(url, res.news, 10000); // 1770000
-          setLoading(false);
-        }
-      } catch (error) {
-        setLoading(false);
-        setError(error.message);
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ["@articles", { country, category }],
+    queryFn: async () => {
+      const req = await fetch(url);
+      const res = await req.json();
+      if (!req.ok) {
+        throw new Error("Failed to fetch!");
       }
-      setLoading(false);
-    };
-
-    fetchData();
-
-    //  Periodically refresh current cache(url) after ttl
-    const refreshStore = setInterval(() => {
-      fetchData();
-    }, 1800000); //   30mins
-
-    // Periodically remove all cache(url) with ttl
-    const resetStore = setInterval(() => {
-      removeAllItemsWithExpiry();
-      fetchData();
-    }, 43200000); // 12hrs
-
-    return () => {
-      clearInterval(refreshStore);
-      clearInterval(resetStore);
-    };
-  }, [url]);
+      return res.news;
+    },
+  });
 
   return (
     <PostContext.Provider
       value={{
+        data,
+        loading: isPending,
+        isError,
+        error,
         category,
         country,
-        data,
-        loading,
-        error,
-        setData,
-        setUrl,
         setCountry,
         setCategory,
-        setError,
-        setLoading,
       }}
     >
       {children}
