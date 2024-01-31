@@ -43,6 +43,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "./dist"),
     filename: "[name].bundle.js",
+    clean: true,
     assetModuleFilename: "images/[hash][ext][query]",
   },
   devtool: "inline-source-map",
