@@ -2,6 +2,7 @@ const { merge } = require("webpack-merge");
 const common = require("./webpack.common.js");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = merge(common, {
   mode: "production",
@@ -34,7 +35,6 @@ module.exports = merge(common, {
   optimization: {
     minimize: true,
     minimizer: [
-      `...`,
       new CssMinimizerPlugin({
         minimizerOptions: {
           preset: [
@@ -44,6 +44,36 @@ module.exports = merge(common, {
             },
           ],
         },
+      }),
+      new TerserPlugin({
+        test: /\.js(\?.*)?$/i,
+        // Use multi-process parallel running to improve the build speed
+        // Default number of concurrent runs: os.cpus().length - 1
+        parallel: 2,
+        minify: (file, sourceMap) => {
+          // https://github.com/mishoo/UglifyJS2#minify-options
+          const uglifyJsOptions = {
+            /* your `uglify-js` package options */
+          };
+
+          if (sourceMap) {
+            uglifyJsOptions.sourceMap = {
+              content: sourceMap,
+            };
+          }
+
+          return require("uglify-js").minify(file, uglifyJsOptions);
+        },
+        // `terserOptions` options will be passed to `uglify-js`
+        // Link to options - https://github.com/mishoo/UglifyJS#minify-options
+        terserOptions: {
+          format: {
+            comments: false,
+            mangle: true,
+            compress: true,
+          },
+        },
+        extractComments: false,
       }),
     ],
     runtimeChunk: {

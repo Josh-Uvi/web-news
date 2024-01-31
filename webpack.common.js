@@ -29,8 +29,9 @@ module.exports = {
     rules: [
       // JavaScript: Use Babel to transpile JavaScript files
       {
-        test: /\.js$/,
+        test: /\.js$/i,
         use: ["babel-loader"],
+        include: path.resolve(__dirname, "src"),
         exclude: /node_modules/,
       },
 
@@ -38,7 +39,7 @@ module.exports = {
       { test: /\.(?:ico|gif|png|jpg|jpeg)$/i, type: "asset/resource" },
 
       // Fonts and SVGs: Inline files
-      { test: /\.(woff(2)?|eot|ttf|otf|svg|)$/, type: "asset/inline" },
+      { test: /\.(woff(2)?|eot|ttf|otf|svg|)$/i, type: "asset/inline" },
     ],
   },
   resolve: {

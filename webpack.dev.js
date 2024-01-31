@@ -38,7 +38,7 @@ module.exports = merge(common, {
     rules: [
       // Styles: Inject CSS into the head with source maps
       {
-        test: /\.(css)$/,
+        test: /\.(css)$/i,
         use: [
           "style-loader",
           {
