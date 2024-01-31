@@ -58,11 +58,22 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
-        test: /\.(png|woff|woff2|eot|ttf|svg|jpg|gif)$/, // to import images and fonts
-        loader: "url-loader",
-        options: { limit: 8192 },
+        test: /\.(?:ico|gif|png|jpg|jpeg)$/i, // Images
+        type: "asset/resource",
+      },
+      {
+        test: /\.(woff(2)?|eot|ttf|otf|svg|)$/, // Fonts and SVGs
+        type: "asset/inline",
       },
     ],
+  },
+  resolve: {
+    modules: [path.resolve(__dirname, "./src"), "node_modules"],
+    extensions: [".js", ".jsx", ".json"],
+    // alias: {
+    //   "@": path.resolve(__dirname, "./src"),
+    //   assets: path.resolve(__dirname, "./src/assets"),
+    // },
   },
   plugins: [
     new CleanWebpackPlugin(),
