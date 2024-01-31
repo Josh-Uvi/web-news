@@ -9,8 +9,8 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const PORT = process.env.PORT || 4000;
 const HOST = process.env.HOST || "localhost";
-const apiKey = process.env.API_KEY;
-const apiUrl = process.env.API_URL;
+const apiKey = process.env.API_KEY || "";
+const apiUrl = process.env.API_URL || "";
 
 const simpleRequestLogger = (proxyServer, options) => {
   proxyServer.on("proxyReq", (proxyReq, req, res) => {
@@ -37,29 +37,30 @@ const apiProxy = createProxyMiddleware({
 });
 
 module.exports = {
-  entry: "./public/entry.js",
+  entry: {
+    main: path.resolve(__dirname, "./src/index.js"),
+  },
   output: {
-    path: path.join(__dirname, "dist"),
-    filename: "bundle.js",
+    path: path.resolve(__dirname, "./dist"),
+    filename: "[name].bundle.js",
+    assetModuleFilename: "images/[hash][ext][query]",
   },
   devtool: "inline-source-map",
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.js$/, // JavaScript
         exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-        },
+        use: ["babel-loader"],
       },
       {
         test: /\.css$/,
         use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
-        test: /\.(png|woff|woff2|eot|ttf|svg)$/, // to import images and fonts
+        test: /\.(png|woff|woff2|eot|ttf|svg|jpg|gif)$/, // to import images and fonts
         loader: "url-loader",
-        options: { limit: false },
+        options: { limit: 8192 },
       },
     ],
   },
@@ -67,7 +68,10 @@ module.exports = {
     new CleanWebpackPlugin(),
     new Dotenv(),
     new HtmlWebpackPlugin({
-      template: "./public/index.html",
+      title: "World News",
+      template: path.resolve(__dirname, "./src/template.html"), // template file
+      favicon: path.resolve(__dirname, "./src/assets/favicon.ico"),
+      filename: "index.html", // output file
     }),
     new MiniCssExtractPlugin(),
     new MomentLocalesPlugin(),

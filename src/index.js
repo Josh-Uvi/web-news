@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { StyledEngineProvider } from "@mui/material/styles";
-import App from "../src/App";
+import App from "./App";
 
 // import fonts for mui
 import "@fontsource/roboto/300.css";

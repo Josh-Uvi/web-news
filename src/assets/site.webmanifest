@@ -1,6 +1,6 @@
 {
-  "name": "web news",
-  "short_name": "web-news",
+  "name": "world news",
+  "short_name": "world-news",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
