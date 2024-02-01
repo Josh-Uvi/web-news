@@ -40,15 +40,19 @@ export default function SelectComponent() {
           id="demo-simple-select-standard"
           value={context.country}
           onChange={handleChange}
-          label="Regions"
           MenuProps={MenuProps}
           sx={{ color: "#fff" }}
+          role="listbox"
         >
           {Array.from(countries)
             .sort((a, b) => a.country.localeCompare(b.country))
             .map((region) => (
-              <MenuItem key={region.key} value={region.key.toLowerCase()}>
-                <ListItemText primary={region.country} />
+              <MenuItem
+                role="option"
+                key={region.key}
+                value={region.key.toLowerCase()}
+              >
+                <ListItemText aria-label="country" primary={region.country} />
               </MenuItem>
             ))}
         </Select>

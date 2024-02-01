@@ -37,15 +37,22 @@ const DrawerItem = () => {
             sx={{ fontWeight: "700", fontSize: 16, textTransform: "uppercase" }}
             component="div"
             id="nested-list-subheader"
+            aria-label="list-categories"
           >
             Categories
           </ListSubheader>
         }
+        role="list"
       >
         {Array.from(categories)
           .sort((a, b) => a.category.localeCompare(b.category))
           .map((article, index) => (
-            <ListItem key={article.category} disablePadding>
+            <ListItem
+              aria-labelledby="nested-list"
+              role="listitem"
+              key={article.category}
+              disablePadding
+            >
               <ListItemButton
                 key={index}
                 selected={context.category == article.category ? true : false}
@@ -58,11 +65,15 @@ const DrawerItem = () => {
                     backgroundColor: "#1976d2",
                   },
                 }}
+                aria-label="category-button"
               >
-                <ListItemIcon>{article.icon}</ListItemIcon>
+                <ListItemIcon aria-label="category-icon">
+                  {article.icon}
+                </ListItemIcon>
                 <ListItemText
                   sx={{ textTransform: "capitalize" }}
                   primary={article.category}
+                  aria-label="value-of-category"
                 />
               </ListItemButton>
             </ListItem>

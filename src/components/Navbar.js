@@ -46,6 +46,7 @@ const Navbar = () => {
           sx={{ ml: 1 }}
           onClick={colorMode.toggleColorMode}
           color="inherit"
+          aria-label="toggle color mode"
         >
           {theme.palette.mode === "dark" ? (
             <Brightness7Icon />
