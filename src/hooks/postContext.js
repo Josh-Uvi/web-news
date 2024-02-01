@@ -15,12 +15,16 @@ export function PostContextProvider({ children }) {
   const { isPending, isError, data, error } = useQuery({
     queryKey: ["@news", { country, category }],
     queryFn: async () => {
-      const req = await fetch(url);
-      const res = await req.json();
-      if (!req.ok) {
-        throw new Error("Failed to fetch!");
+      try {
+        const req = await fetch(url);
+        if (!req.ok) {
+          throw new Error("Failed to fetch!");
+        }
+        const res = await req.json();
+        return res.news;
+      } catch (err) {
+        throw new Error(err.message);
       }
-      return res.news;
     },
   });
 

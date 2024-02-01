@@ -6,7 +6,7 @@ import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
-import cardImg from "../assets/background.png";
+import cardImg from "../assets/background.jpg";
 import { formatTime } from "../hooks/helpers";
 
 export default function MediaCard({ data }) {
@@ -31,6 +31,7 @@ export default function MediaCard({ data }) {
         alt={data.title}
         height="240"
         component="img"
+        fetchpriority="high"
       />
       <CardContent>
         <Typography
