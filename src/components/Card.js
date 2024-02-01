@@ -66,8 +66,11 @@ export default function MediaCard({ data }) {
           size="small"
           target="_blank"
           rel="noopener noreferrer"
+          sx={{
+            textTransform: "capitalize",
+          }}
         >
-          Read More
+          continue reading
         </Button>
       </CardActions>
     </Card>

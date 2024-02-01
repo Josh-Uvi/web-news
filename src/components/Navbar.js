@@ -40,7 +40,7 @@ const Navbar = () => {
           <MenuIcon />
         </IconButton>
         <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>
-          Uvi News
+          World News
         </Typography>
         <IconButton
           sx={{ ml: 1 }}

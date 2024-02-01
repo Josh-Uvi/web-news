@@ -3,6 +3,7 @@ const common = require("./webpack.common.js");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
 
 module.exports = merge(common, {
   mode: "production",
@@ -54,6 +55,8 @@ module.exports = merge(common, {
           // https://github.com/mishoo/UglifyJS2#minify-options
           const uglifyJsOptions = {
             /* your `uglify-js` package options */
+            mangle: true,
+            compress: true,
           };
 
           if (sourceMap) {
@@ -69,16 +72,49 @@ module.exports = merge(common, {
         terserOptions: {
           format: {
             comments: false,
-            mangle: true,
-            compress: true,
           },
         },
         extractComments: false,
+      }),
+      new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            plugins: [
+              ["gifsicle", { interlaced: true }],
+              ["jpegtran", { progressive: true }],
+              ["optipng", { optimizationLevel: 7 }],
+            ],
+          },
+        },
+        // Disable `loader`
+        loader: false,
       }),
     ],
     runtimeChunk: {
       name: "runtime",
     },
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/](react|react-dom|moment|@mui|@emotion|@fontsource|@babel|src)[\\/]/,
+          // cacheGroupKey here is `commons` as the key of the cacheGroup
+          name(module, chunks, cacheGroupKey) {
+            const moduleFileName = module
+              .identifier()
+              .split("/")
+              .reduceRight((item) => item);
+            const allChunksNames = chunks.map((item) => item.name).join("~");
+            return `${cacheGroupKey}-${allChunksNames}-${moduleFileName}`;
+          },
+          chunks: "all",
+          usedExports: true,
+          priority: -20,
+          reuseExistingChunk: true,
+        },
+      },
+    },
+    removeEmptyChunks: true,
   },
   performance: {
     hints: false,
