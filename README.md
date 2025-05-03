@@ -1,17 +1,13 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/afde0104-c069-498b-89d3-7a4c9756b0d0/deploy-status)](https://app.netlify.com/sites/uvi-worldnews/deploys)
 
-# Welcome to web news
+# Web news (WIP)
 
-A website that fetches most recent news feeds from different news sources through a custom rest api endpoint.
+A website that shows the latest news from different sources using a custom API.
 
-# Install packages
+### Run Steps
 
-Run npm install
+- Install packages with `npm install` or `yarn install` command
 
-# Start project in development mode
+- Start project in development mode with `npm run dev` or `yarn dev` command
 
-Run npm run dev
-
-# Build for production
-
-Run npm run build
+- Build for production with `npm run build` or `yarn build` command

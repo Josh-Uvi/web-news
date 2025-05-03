@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: "Web News"
+  description: A news aggregator app built with react & currentsapi
+spec:
+  type: website
+  owner: eagles
+  lifecycle: production
