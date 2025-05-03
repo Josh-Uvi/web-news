@@ -1,8 +1,8 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: web-news
-  description: A news aggregator app built with react & currentsapi
+  name: "Web-News"
+  description: A news aggregator app built with React & Currents API
 spec:
   type: website
   owner: eagles
