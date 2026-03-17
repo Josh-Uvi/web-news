@@ -4,6 +4,18 @@
 
 A modern news aggregator application built with React and Webpack that displays the latest news from around the world. The application fetches news from the Currents API and provides a clean, responsive interface for browsing news by category and region.
 
+## Table of Contents
+
+1. [Features](#features)
+2. [Tech Stack](#tech-stack)
+3. [Security Features](#security-features)
+4. [Development Steps](#development-steps)
+5. [Run Book](#run-book)
+6. [Project Structure](#project-structure)
+7. [API Reference](#api-reference)
+8. [Contributing](#contributing)
+9. [License](#license)
+
 ## Features
 
 - **News Aggregation**: Fetches latest news from multiple sources via Currents API
