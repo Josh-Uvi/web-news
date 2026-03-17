@@ -8,6 +8,19 @@
       name="description"
       content="News aggregator app built with react and webpack"
     />
+    <!-- MEDIUM: Content Security Policy meta tag for additional security -->
+    <!-- Note: frame-ancestors removed - only works via HTTP headers (configured in netlify.toml) -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self';
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: https:;
+      connect-src 'self';
+      font-src 'self' data:;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+    ">
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
 

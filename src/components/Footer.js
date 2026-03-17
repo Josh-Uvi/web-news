@@ -21,7 +21,6 @@ export default function Footer() {
             Josh Uvi
           </Link>{" "}
           {new Date().getFullYear()}
-          {"."}
         </Typography>
       </Container>
     </Box>

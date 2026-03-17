@@ -3,11 +3,10 @@ const common = require("./webpack.common.js");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
 
 module.exports = merge(common, {
   mode: "production",
-  devtool: "source-map",
+  devtool: false, // Disabled for security - source maps should not be exposed in production
   module: {
     rules: [
       {
@@ -75,20 +74,6 @@ module.exports = merge(common, {
           },
         },
         extractComments: false,
-      }),
-      new ImageMinimizerPlugin({
-        minimizer: {
-          implementation: ImageMinimizerPlugin.imageminMinify,
-          options: {
-            plugins: [
-              ["gifsicle", { interlaced: true }],
-              ["jpegtran", { progressive: true }],
-              ["optipng", { optimizationLevel: 7 }],
-            ],
-          },
-        },
-        // Disable `loader`
-        loader: false,
       }),
     ],
     runtimeChunk: {

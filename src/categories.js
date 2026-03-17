@@ -11,4 +11,5 @@ export default [
   { icon: "🚘", category: "travel" },
   { icon: "🧫", category: "culture" },
   { icon: "⏳", category: "economy" },
+  { icon: "🔒", category: "security" },
 ];

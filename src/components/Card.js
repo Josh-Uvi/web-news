@@ -9,7 +9,26 @@ import Typography from "@mui/material/Typography";
 import cardImg from "../assets/background.jpg";
 import { formatTime } from "../hooks/helpers";
 
+// HIGH: URL validation for external links
+const isValidUrl = (url) => {
+  try {
+    const parsedUrl = new URL(url);
+    return ['http:', 'https:'].includes(parsedUrl.protocol);
+  } catch {
+    return false;
+  }
+};
+
 export default function MediaCard({ data }) {
+  const handleLinkClick = (e) => {
+    if (!data.url || !isValidUrl(data.url)) {
+      e.preventDefault();
+      console.warn('Invalid or missing URL');
+    }
+  };
+
+  const safeUrl = data.url && isValidUrl(data.url) ? data.url : '#';
+
   return (
     <Card
       sx={{
@@ -32,6 +51,7 @@ export default function MediaCard({ data }) {
         height="240"
         component="img"
         fetchpriority="high"
+        loading="lazy"
       />
       <CardContent>
         <Typography
@@ -63,10 +83,11 @@ export default function MediaCard({ data }) {
       <CardActions sx={{ justifyContent: "space-between", px: 2 }}>
         <Typography>{formatTime(data.published)}</Typography>
         <Button
-          href={data.url}
+          href={safeUrl}
           size="small"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={handleLinkClick}
           sx={{
             textTransform: "capitalize",
           }}

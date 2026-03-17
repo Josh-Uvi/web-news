@@ -2,6 +2,8 @@ node_modules
 dist
 package-lock.json
 .env
+.env.local
 .DS_Store
 # Local Netlify folder
 .netlify
+SECURITY_ANALYSIS.md
