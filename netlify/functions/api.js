@@ -209,6 +209,42 @@ const getConfiguredProviders = () => {
   ].filter(Boolean);
 };
 
+const getProviderMetadata = (providers) => ({
+  availableProviders: providers.map(({ name }) => name),
+  defaultProvider: providers[0]?.name,
+});
+
+const resolveProviderOrder = (providers, requestedProvider) => {
+  const metadata = getProviderMetadata(providers);
+
+  if (!requestedProvider) {
+    return {
+      ...metadata,
+      selectedProvider: metadata.defaultProvider,
+      providersToTry: providers,
+    };
+  }
+
+  const prioritizedProvider = providers.find(({ name }) => name === requestedProvider);
+
+  if (!prioritizedProvider) {
+    return {
+      ...metadata,
+      selectedProvider: metadata.defaultProvider,
+      providersToTry: providers,
+    };
+  }
+
+  return {
+    ...metadata,
+    selectedProvider: prioritizedProvider.name,
+    providersToTry: [
+      prioritizedProvider,
+      ...providers.filter(({ name }) => name !== prioritizedProvider.name),
+    ],
+  };
+};
+
 const createHttpError = (message, statusCode, code, provider) => {
   const error = new Error(message);
   error.statusCode = statusCode;
@@ -249,8 +285,15 @@ const newsProxy = async (req, res, next) => {
     });
   }
 
-  const country = req.query.country;
-  const category = req.query.category;
+  const country = normalizeString(req.query.country)?.toLowerCase();
+  const category = normalizeString(req.query.category)?.toLowerCase();
+  const requestedProvider = normalizeString(req.query.provider)?.toLowerCase();
+  const {
+    providersToTry,
+    availableProviders,
+    defaultProvider,
+    selectedProvider,
+  } = resolveProviderOrder(providers, requestedProvider);
 
   // CRITICAL: Input validation
   if (!ALLOWED_COUNTRIES.includes(country)) {
@@ -267,16 +310,22 @@ const newsProxy = async (req, res, next) => {
   try {
     let fallbackError;
 
-    for (let index = 0; index < providers.length; index += 1) {
-      const provider = providers[index];
+    for (let index = 0; index < providersToTry.length; index += 1) {
+      const provider = providersToTry[index];
 
       try {
         const data = await fetchProviderNews(provider, params);
-        return res.status(200).json(data);
+        return res.status(200).json({
+          ...data,
+          activeProvider: provider.name,
+          selectedProvider,
+          defaultProvider,
+          availableProviders,
+        });
       } catch (error) {
         fallbackError = error;
 
-        const canFallback = error.statusCode === 429 && index < providers.length - 1;
+        const canFallback = error.statusCode === 429 && index < providersToTry.length - 1;
 
         if (canFallback) {
           console.warn(`Provider ${provider.name} returned 429, attempting fallback provider.`);
@@ -308,6 +357,10 @@ const newsProxy = async (req, res, next) => {
         : error.message,
       code: code,
       provider: error.provider,
+      activeProvider: error.provider,
+      selectedProvider,
+      defaultProvider,
+      availableProviders,
     });
   }
 };

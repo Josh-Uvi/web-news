@@ -20,6 +20,7 @@ A modern news aggregator application built with React and Webpack that displays 
 
 - **News Aggregation**: Fetches latest news via Currents API and NewsAPI
 - **Provider Fallback**: Automatically falls back to the other configured provider when one returns HTTP 429
+- **Provider Switcher**: Sidebar selector shows the active/default provider and lets users switch between configured providers
 - **Category Filtering**: Browse news by categories (general, business, entertainment, health, science, sports, technology)
 - **Region Support**: Filter news by country (GB, US, CA, AU, DE, FR, JP, IN, IT, BR, ES, NG, CN)
 - **Responsive Design**: Material-UI based responsive layout that works on all devices
@@ -271,6 +272,7 @@ web-news/
     │   ├── ErrorBoundary.js # Error boundary component
     │   ├── Footer.js        # Footer component
     │   ├── Navbar.js        # Navigation bar
+    │   ├── ProviderSelect.js # News provider selector
     │   ├── Router.js        # Route configuration
     │   └── Select.js        # Dropdown select component
     ├── hooks/               # Custom React hooks
@@ -295,6 +297,7 @@ Fetches latest news from the configured provider(s).
 
 - Configure **either** Currents API or NewsAPI.
 - If **both** are configured, the backend tries CurrentsAPI first and automatically retries with NewsAPI when CurrentsAPI returns **429 Too Many Requests**.
+- The sidebar provider selector uses the optional `provider` query parameter to request a specific configured provider.
 
 **Query Parameters:**
 
@@ -302,6 +305,7 @@ Fetches latest news from the configured provider(s).
 |-----------|----------|--------|
 | country | Yes | gb, us, ca, au, de, fr, jp, in, it, br, es, ng, cn |
 | category | Yes | general, business, entertainment, health, science, sports, technology |
+| provider | No | currentsapi, newsapi |
 
 **Response:**
 
@@ -319,7 +323,11 @@ Fetches latest news from the configured provider(s).
       "category": ["string"]
     }
   ],
-  "provider": "currentsapi | newsapi"
+  "provider": "currentsapi | newsapi",
+  "activeProvider": "currentsapi | newsapi",
+  "selectedProvider": "currentsapi | newsapi",
+  "defaultProvider": "currentsapi | newsapi",
+  "availableProviders": ["currentsapi", "newsapi"]
 }
 ```
 

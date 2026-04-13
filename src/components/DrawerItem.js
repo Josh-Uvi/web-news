@@ -15,6 +15,7 @@ import {
 import StreetviewOutlinedIcon from "@mui/icons-material/StreetviewOutlined";
 
 import categories from "../categories";
+import ProviderSelect from "./ProviderSelect";
 
 const DrawerItem = () => {
   const context = usePost();
@@ -30,6 +31,8 @@ const DrawerItem = () => {
       >
         <StreetviewOutlinedIcon fontSize="large" />
       </Toolbar>
+      <Divider />
+      <ProviderSelect />
       <Divider />
       <List
         subheader={

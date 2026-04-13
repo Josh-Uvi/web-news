@@ -88,6 +88,42 @@ const getConfiguredProviders = () => {
   ].filter(Boolean);
 };
 
+const getProviderMetadata = (providers) => ({
+  availableProviders: providers.map(({ name }) => name),
+  defaultProvider: providers[0]?.name,
+});
+
+const resolveProviderOrder = (providers, requestedProvider) => {
+  const metadata = getProviderMetadata(providers);
+
+  if (!requestedProvider) {
+    return {
+      ...metadata,
+      selectedProvider: metadata.defaultProvider,
+      providersToTry: providers,
+    };
+  }
+
+  const prioritizedProvider = providers.find(({ name }) => name === requestedProvider);
+
+  if (!prioritizedProvider) {
+    return {
+      ...metadata,
+      selectedProvider: metadata.defaultProvider,
+      providersToTry: providers,
+    };
+  }
+
+  return {
+    ...metadata,
+    selectedProvider: prioritizedProvider.name,
+    providersToTry: [
+      prioritizedProvider,
+      ...providers.filter(({ name }) => name !== prioritizedProvider.name),
+    ],
+  };
+};
+
 const fetchProviderNews = async (provider, params) => {
   const { url, options } = provider.buildRequest(params);
   const response = await fetch(url, options);
@@ -123,8 +159,15 @@ const createNewsHandler = () => async (req, res) => {
     });
   }
 
-  const country = String(req.query.country || "").toLowerCase();
-  const category = String(req.query.category || "").toLowerCase();
+  const country = normalizeString(req.query.country)?.toLowerCase();
+  const category = normalizeString(req.query.category)?.toLowerCase();
+  const requestedProvider = normalizeString(req.query.provider)?.toLowerCase();
+  const {
+    providersToTry,
+    availableProviders,
+    defaultProvider,
+    selectedProvider,
+  } = resolveProviderOrder(providers, requestedProvider);
 
   if (!ALLOWED_COUNTRIES.includes(country)) {
     return res.status(400).json({ message: "Invalid country parameter" });
@@ -136,15 +179,21 @@ const createNewsHandler = () => async (req, res) => {
 
   let lastError;
 
-  for (let index = 0; index < providers.length; index += 1) {
-    const provider = providers[index];
+  for (let index = 0; index < providersToTry.length; index += 1) {
+    const provider = providersToTry[index];
 
     try {
       const data = await fetchProviderNews(provider, { country, category });
-      return res.status(200).json(data);
+      return res.status(200).json({
+        ...data,
+        activeProvider: provider.name,
+        selectedProvider,
+        defaultProvider,
+        availableProviders,
+      });
     } catch (error) {
       lastError = error;
-      const canFallback = error.statusCode === 429 && index < providers.length - 1;
+      const canFallback = error.statusCode === 429 && index < providersToTry.length - 1;
 
       if (canFallback) {
         console.warn(`[DEV API] Provider ${provider.name} returned 429, attempting fallback provider.`);
@@ -159,6 +208,10 @@ const createNewsHandler = () => async (req, res) => {
     message: lastError?.message || "An unexpected error occurred",
     code: lastError?.code || "INTERNAL_ERROR",
     provider: lastError?.provider,
+    activeProvider: lastError?.provider,
+    selectedProvider,
+    defaultProvider,
+    availableProviders,
   });
 };
 
