@@ -8,8 +8,8 @@ const api = express();
 const router = Router();
 
 // CRITICAL: Input validation allowlists
-const ALLOWED_COUNTRIES = ['gb', 'us', 'ca', 'au', 'de', 'fr', 'jp', 'in', 'it', 'br'];
-const ALLOWED_CATEGORIES = ['general', 'business', 'entertainment', 'health', 'science', 'sports', 'technology'];
+const ALLOWED_COUNTRIES = ['gb', 'us', 'ca', 'au', 'de', 'fr', 'jp', 'in', 'it', 'br', 'es', 'ng'];
+const ALLOWED_CATEGORIES = ['general', 'business', 'entertainment', 'sports', 'technology'];
 
 // HIGH: Rate limiting configuration (in-memory for serverless)
 const rateLimitMap = new Map();

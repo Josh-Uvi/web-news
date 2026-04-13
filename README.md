@@ -290,8 +290,8 @@ Fetches latest news from Currents API.
 
 | Parameter | Required | Values |
 |-----------|----------|--------|
-| country | Yes | gb, us, ca, au, de, fr, jp, in, it, br |
-| category | Yes | general, business, entertainment, health, science, sports, technology |
+| country | Yes | gb, us, ca, au, de, fr, jp, in, it, br, 'es', 'ng' |
+| category | Yes | general, business, entertainment, sports, technology |
 
 **Response:**
 
