@@ -20,7 +20,7 @@ export default function Footer() {
           <Link color="inherit" href="https://github.com/Josh-Uvi/web-news">
             Josh Uvi
           </Link>{" "}
-          {new Date().getFullYear()}
+          {new Date().getFullYear()}. All rights reserved.
         </Typography>
       </Container>
     </Box>

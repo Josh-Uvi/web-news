@@ -39,7 +39,15 @@ const Navbar = () => {
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>
+        <Typography
+          variant="h5"
+          component="div"
+          sx={{
+            flexGrow: 1,
+            fontSize: { xs: "1.1rem", sm: "1.5rem" },
+            fontWeight: 700,
+          }}
+        >
           World News
         </Typography>
         <IconButton
