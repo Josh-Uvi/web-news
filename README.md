@@ -2,7 +2,7 @@
 
 # UVI News
 
-A modern news aggregator application built with React and Webpack that displays the latest news from around the world. The application fetches news from the Currents API and provides a clean, responsive interface for browsing news by category and region.
+A modern news aggregator application built with React and Webpack that displays the latest news from around the world. The application fetches news from Currents API and/or NewsAPI and provides a clean, responsive interface for browsing news by category and region.
 
 ## Table of Contents
 
@@ -18,9 +18,10 @@ A modern news aggregator application built with React and Webpack that displays 
 
 ## Features
 
-- **News Aggregation**: Fetches latest news from multiple sources via Currents API
+- **News Aggregation**: Fetches latest news via Currents API and NewsAPI
+- **Provider Fallback**: Automatically falls back to the other configured provider when one returns HTTP 429
 - **Category Filtering**: Browse news by categories (general, business, entertainment, health, science, sports, technology)
-- **Region Support**: Filter news by country (GB, US, CA, AU, DE, FR, JP, IN, IT, BR)
+- **Region Support**: Filter news by country (GB, US, CA, AU, DE, FR, JP, IN, IT, BR, ES, NG, CN)
 - **Responsive Design**: Material-UI based responsive layout that works on all devices
 - **Dark/Light Theme**: Toggle between dark and light themes
 - **Persistent Caching**: React Query with localStorage persistence for offline support
@@ -35,7 +36,7 @@ A modern news aggregator application built with React and Webpack that displays 
 - **Styling**: Emotion (CSS-in-JS)
 - **Date Handling**: date-fns
 - **Deployment**: Netlify (Serverless Functions)
-- **API**: Currents API (<https://currentsapi.services/>)
+- **API**: Currents API (<https://currentsapi.services/>) and NewsAPI (<https://newsapi.org/>)
 
 ## Security Features
 
@@ -58,7 +59,9 @@ This application implements comprehensive security measures:
 
 - Node.js >= 24.13.1
 - npm >= 11.8.0
-- Currents API key (get one at <https://currentsapi.services/>)
+- At least one news provider API key:
+  - Currents API key (get one at <https://currentsapi.services/>)
+  - NewsAPI key (get one at <https://newsapi.org/>)
 
 ### Initial Setup
 
@@ -86,9 +89,11 @@ This application implements comprehensive security measures:
    Edit `.env` with your configuration:
 
    ```env
-   # API Configuration
-   API_KEY=your_api_key_here
-   API_URL=https://api.currentsapi.services/v1/latest-news
+    # API Configuration
+    CURRENTS_API_KEY=your_currents_api_key_here
+    CURRENTS_API_URL=https://api.currentsapi.services/v1/latest-news
+    NEWS_API_KEY=your_newsapi_key_here
+    NEWS_API_URL=https://newsapi.org/v2/top-headlines
    
    # Server Configuration (Development)
    PORT=4000
@@ -132,7 +137,7 @@ This application implements comprehensive security measures:
 
    - Webpack dev server starts on `http://localhost:4000`
    - Hot Module Replacement (HMR) enabled
-   - API proxy configured at `/api/*` → Currents API
+   - API proxy configured at `/api/news` with CurrentsAPI / NewsAPI fallback support
 
 2. **Make changes**
    - Edit files in `src/` directory
@@ -179,8 +184,10 @@ The application is configured for Netlify deployment:
 3. **Environment Variables (Netlify)**
 
    Set in Netlify dashboard under Site Settings > Environment Variables:
-   - `API_KEY`: Your Currents API key
-   - `API_URL`: <https://api.currentsapi.services/v1/latest-news>
+    - `CURRENTS_API_KEY`: Your Currents API key (or legacy `API_KEY`)
+    - `CURRENTS_API_URL`: <https://api.currentsapi.services/v1/latest-news> (or legacy `API_URL`)
+    - `NEWS_API_KEY`: Your NewsAPI key
+    - `NEWS_API_URL`: <https://newsapi.org/v2/top-headlines>
    - `ALLOWED_ORIGINS`: Your production domain(s)
    - `NODE_ENV`: production
 
@@ -190,7 +197,7 @@ The application is configured for Netlify deployment:
 
 | Issue | Solution |
 |-------|----------|
-| API returns 500 error | Check `API_KEY` and `API_URL` environment variables |
+| API returns 500 error | Check your configured `CURRENTS_API_*` / `NEWS_API_*` environment variables |
 | CORS errors in production | Verify `ALLOWED_ORIGINS` includes your domain |
 | Fonts not loading | CSP `font-src` includes `data:` |
 | Rate limit exceeded | Wait 15 minutes or adjust rate limit in `netlify/functions/api.js` |
@@ -284,14 +291,17 @@ web-news/
 
 ### GET /api/news
 
-Fetches latest news from Currents API.
+Fetches latest news from the configured provider(s).
+
+- Configure **either** Currents API or NewsAPI.
+- If **both** are configured, the backend tries CurrentsAPI first and automatically retries with NewsAPI when CurrentsAPI returns **429 Too Many Requests**.
 
 **Query Parameters:**
 
 | Parameter | Required | Values |
 |-----------|----------|--------|
-| country | Yes | gb, us, ca, au, de, fr, jp, in, it, br, 'es', 'ng' |
-| category | Yes | general, business, entertainment, sports, technology |
+| country | Yes | gb, us, ca, au, de, fr, jp, in, it, br, es, ng, cn |
+| category | Yes | general, business, entertainment, health, science, sports, technology |
 
 **Response:**
 
@@ -308,7 +318,8 @@ Fetches latest news from Currents API.
       "author": "string",
       "category": ["string"]
     }
-  ]
+  ],
+  "provider": "currentsapi | newsapi"
 }
 ```
 

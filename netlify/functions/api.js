@@ -8,8 +8,10 @@ const api = express();
 const router = Router();
 
 // CRITICAL: Input validation allowlists
-const ALLOWED_COUNTRIES = ['gb', 'us', 'ca', 'au', 'de', 'fr', 'jp', 'in', 'it', 'br', 'es', 'ng'];
-const ALLOWED_CATEGORIES = ['general', 'business', 'entertainment', 'sports', 'technology'];
+const ALLOWED_COUNTRIES = ['gb', 'us', 'ca', 'au', 'de', 'fr', 'jp', 'in', 'it', 'br', 'es', 'ng', 'cn'];
+const ALLOWED_CATEGORIES = ['general', 'business', 'entertainment', 'health', 'science', 'sports', 'technology'];
+const DEFAULT_CURRENTS_API_URL = 'https://api.currentsapi.services/v1/latest-news';
+const DEFAULT_NEWS_API_URL = 'https://newsapi.org/v2/top-headlines';
 
 // HIGH: Rate limiting configuration (in-memory for serverless)
 const rateLimitMap = new Map();
@@ -121,13 +123,126 @@ const fetchWithTimeout = async (url, options = {}, timeout = 10000) => {
   }
 };
 
-const newsProxy = async (req, res, next) => {
-  // CRITICAL: Validate environment variables
-  const apiKey = process.env.API_KEY;
-  const apiUrl = process.env.API_URL;
+const normalizeString = (value) => {
+  if (value === null || value === undefined) return undefined;
 
-  if (!apiKey || !apiUrl) {
-    console.error("Missing required environment variables");
+  const normalizedValue = String(value).trim();
+  return normalizedValue.length > 0 ? normalizedValue : undefined;
+};
+
+const normalizeSource = (source) => {
+  if (!source) return undefined;
+
+  if (typeof source === 'string') {
+    return normalizeString(source);
+  }
+
+  if (typeof source === 'object') {
+    return normalizeString(source.name || source.title || source.id);
+  }
+
+  return undefined;
+};
+
+const normalizeArticle = (article, providerName) => ({
+  id: normalizeString(article.id || article.url || article.title),
+  title: normalizeString(article.title) || 'Untitled article',
+  description: normalizeString(article.description),
+  url: normalizeString(article.url),
+  image: normalizeString(article.image || article.urlToImage),
+  published: normalizeString(article.published || article.publishedAt),
+  author: normalizeString(article.author),
+  category: Array.isArray(article.category) ? article.category : [],
+  source: normalizeSource(article.source) || providerName,
+});
+
+const normalizeProviderResponse = (providerName, data) => {
+  const articles = providerName === 'newsapi'
+    ? data?.articles
+    : data?.news;
+
+  return {
+    news: Array.isArray(articles)
+      ? articles.map((article) => normalizeArticle(article, providerName))
+      : [],
+    provider: providerName,
+  };
+};
+
+const getConfiguredProviders = () => {
+  const currentsApiKey = process.env.CURRENTS_API_KEY || process.env.API_KEY;
+  const currentsApiUrl = process.env.CURRENTS_API_URL || process.env.API_URL || DEFAULT_CURRENTS_API_URL;
+  const newsApiKey = process.env.NEWS_API_KEY;
+  const newsApiUrl = process.env.NEWS_API_URL || DEFAULT_NEWS_API_URL;
+
+  return [
+    currentsApiKey
+      ? {
+          name: 'currentsapi',
+          apiKey: currentsApiKey,
+          apiUrl: currentsApiUrl,
+          buildRequest: ({ country, category }) => ({
+            url: `${currentsApiUrl}?${new URLSearchParams({ country, category }).toString()}`,
+            options: {
+              headers: {
+                Authorization: currentsApiKey,
+              },
+            },
+          }),
+        }
+      : null,
+    newsApiKey
+      ? {
+          name: 'newsapi',
+          apiKey: newsApiKey,
+          apiUrl: newsApiUrl,
+          buildRequest: ({ country, category }) => ({
+            url: `${newsApiUrl}?${new URLSearchParams({ country, category }).toString()}`,
+            options: {
+              headers: {
+                'X-Api-Key': newsApiKey,
+              },
+            },
+          }),
+        }
+      : null,
+  ].filter(Boolean);
+};
+
+const createHttpError = (message, statusCode, code, provider) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  error.code = code;
+  error.provider = provider;
+  return error;
+};
+
+const fetchProviderNews = async (provider, params) => {
+  const { url, options } = provider.buildRequest(params);
+  const response = await fetchWithTimeout(url, options, 10000);
+
+  if (!response.ok) {
+    let errorMessage = `HTTP error! status: ${response.status}`;
+
+    try {
+      const errorPayload = await response.json();
+      errorMessage = errorPayload?.message || errorPayload?.error || errorPayload?.code || errorMessage;
+    } catch {
+      // Ignore JSON parsing errors and fall back to the default message.
+    }
+
+    throw createHttpError(errorMessage, response.status, response.status === 429 ? 'RATE_LIMIT_EXCEEDED' : 'UPSTREAM_ERROR', provider.name);
+  }
+
+  const data = await response.json();
+  return normalizeProviderResponse(provider.name, data);
+};
+
+const newsProxy = async (req, res, next) => {
+  const providers = getConfiguredProviders();
+
+  if (providers.length === 0) {
+    console.error("Missing required news provider environment variables");
     return res.status(500).json({
       message: "Server configuration error",
       code: "CONFIG_ERROR"
@@ -147,22 +262,32 @@ const newsProxy = async (req, res, next) => {
   }
 
   // Use URLSearchParams for proper encoding
-  const params = new URLSearchParams({ country, category });
+  const params = { country, category };
 
   try {
-    const response = await fetchWithTimeout(`${apiUrl}?${params}`, {
-      headers: { Authorization: apiKey }
-    }, 10000);
+    let fallbackError;
 
-    if (!response.ok) {
-      const error = new Error(`HTTP error! status: ${response.status}`);
-      error.statusCode = response.status;
-      throw error;
+    for (let index = 0; index < providers.length; index += 1) {
+      const provider = providers[index];
+
+      try {
+        const data = await fetchProviderNews(provider, params);
+        return res.status(200).json(data);
+      } catch (error) {
+        fallbackError = error;
+
+        const canFallback = error.statusCode === 429 && index < providers.length - 1;
+
+        if (canFallback) {
+          console.warn(`Provider ${provider.name} returned 429, attempting fallback provider.`);
+          continue;
+        }
+
+        throw error;
+      }
     }
-    
-    const data = await response.json();
-    res.status(200).json(data);
-    next()
+
+    throw fallbackError || createHttpError('Unable to fetch news', 500, 'INTERNAL_ERROR');
 
   } catch (error) {
     // MEDIUM: Proper error handling
@@ -174,15 +299,16 @@ const newsProxy = async (req, res, next) => {
       code: code,
       path: req.path,
       method: req.method,
+      provider: error.provider,
     });
 
-    res.status(statusCode).json({
+    return res.status(statusCode).json({
       message: process.env.NODE_ENV === 'production'
         ? 'An unexpected error occurred'
         : error.message,
       code: code,
+      provider: error.provider,
     });
-    next(error)
   }
 };
 
@@ -192,6 +318,10 @@ api.use("/api/", router);
 
 // MEDIUM: Global error handler
 api.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+
   console.error('Unhandled error:', {
     message: err.message,
     stack: process.env.NODE_ENV !== 'production' ? err.stack : undefined,

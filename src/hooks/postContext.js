@@ -7,20 +7,19 @@ const PostContext = createContext();
 export function PostContextProvider({ children }) {
   const [category, setCategory] = useLocalStorage("@category", "general");
   const [country, setCountry] = useLocalStorage("@country", "gb");
-  const url =
-    process.env.NODE_ENV !== "production"
-      ? `/api?country=${country}&category=${category}`
-      : `/api/news?country=${country}&category=${category}`;
+  const url = `/api/news?country=${country}&category=${category}`;
 
   const { isPending, isError, data, error } = useQuery({
     queryKey: ["@news", { country, category }],
     queryFn: async () => {
       try {
         const req = await fetch(url);
-        if (!req.ok) {
-          throw new Error("Failed to fetch!");
-        }
         const res = await req.json();
+
+        if (!req.ok) {
+          throw new Error(res?.message || "Failed to fetch!");
+        }
+
         return res.news;
       } catch (err) {
         throw new Error(err.message);

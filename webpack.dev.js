@@ -1,41 +1,166 @@
 const { merge } = require("webpack-merge");
 const common = require("./webpack.common.js");
-const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const PORT = process.env.PORT || 4000;
 const HOST = process.env.HOST || "localhost";
-const apiKey = process.env.API_KEY || "";
-const apiUrl = process.env.API_URL || "";
+const ALLOWED_COUNTRIES = ["gb", "us", "ca", "au", "de", "fr", "jp", "in", "it", "br", "es", "ng", "cn"];
+const ALLOWED_CATEGORIES = ["general", "business", "entertainment", "health", "science", "sports", "technology"];
+const DEFAULT_CURRENTS_API_URL = "https://api.currentsapi.services/v1/latest-news";
+const DEFAULT_NEWS_API_URL = "https://newsapi.org/v2/top-headlines";
 
-// Only create proxy if target is valid
-const shouldUseProxy = apiUrl && apiUrl.startsWith("http");
+const normalizeString = (value) => {
+  if (value === null || value === undefined) return undefined;
 
-const simpleRequestLogger = (proxyServer, options) => {
-  proxyServer.on("proxyReq", (proxyReq, req, res) => {
-    console.log(`[HPM] [${req.method}] ${req.url}`);
-  });
+  const normalizedValue = String(value).trim();
+  return normalizedValue.length > 0 ? normalizedValue : undefined;
 };
 
-const apiProxy = shouldUseProxy
-  ? createProxyMiddleware({
-      target: apiUrl,
-      changeOrigin: true,
-      pathRewrite(pathReq, req) {
-        const pathname = pathReq.split("?")[0];
-        let url = `${pathname}?`;
-        url = Object.entries(req.query).reduce(
-          (newUrl, [key, value]) =>
-            `${newUrl}&${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
-          url
-        );
-        return url;
-      },
-      headers: {
-        Authorization: apiKey,
-      },
-      plugins: [simpleRequestLogger],
-    })
-  : null;
+const normalizeSource = (source) => {
+  if (!source) return undefined;
+
+  if (typeof source === "string") {
+    return normalizeString(source);
+  }
+
+  if (typeof source === "object") {
+    return normalizeString(source.name || source.title || source.id);
+  }
+
+  return undefined;
+};
+
+const normalizeArticle = (article, providerName) => ({
+  id: normalizeString(article.id || article.url || article.title),
+  title: normalizeString(article.title) || "Untitled article",
+  description: normalizeString(article.description),
+  url: normalizeString(article.url),
+  image: normalizeString(article.image || article.urlToImage),
+  published: normalizeString(article.published || article.publishedAt),
+  author: normalizeString(article.author),
+  category: Array.isArray(article.category) ? article.category : [],
+  source: normalizeSource(article.source) || providerName,
+});
+
+const normalizeProviderResponse = (providerName, data) => {
+  const articles = providerName === "newsapi" ? data?.articles : data?.news;
+
+  return {
+    news: Array.isArray(articles)
+      ? articles.map((article) => normalizeArticle(article, providerName))
+      : [],
+    provider: providerName,
+  };
+};
+
+const getConfiguredProviders = () => {
+  const currentsApiKey = process.env.CURRENTS_API_KEY || process.env.API_KEY;
+  const currentsApiUrl = process.env.CURRENTS_API_URL || process.env.API_URL || DEFAULT_CURRENTS_API_URL;
+  const newsApiKey = process.env.NEWS_API_KEY;
+  const newsApiUrl = process.env.NEWS_API_URL || DEFAULT_NEWS_API_URL;
+
+  return [
+    currentsApiKey
+      ? {
+          name: "currentsapi",
+          buildRequest: ({ country, category }) => ({
+            url: `${currentsApiUrl}?${new URLSearchParams({ country, category }).toString()}`,
+            options: {
+              headers: {
+                Authorization: currentsApiKey,
+              },
+            },
+          }),
+        }
+      : null,
+    newsApiKey
+      ? {
+          name: "newsapi",
+          buildRequest: ({ country, category }) => ({
+            url: `${newsApiUrl}?${new URLSearchParams({ country, category }).toString()}`,
+            options: {
+              headers: {
+                "X-Api-Key": newsApiKey,
+              },
+            },
+          }),
+        }
+      : null,
+  ].filter(Boolean);
+};
+
+const fetchProviderNews = async (provider, params) => {
+  const { url, options } = provider.buildRequest(params);
+  const response = await fetch(url, options);
+
+  if (!response.ok) {
+    let errorMessage = `HTTP error! status: ${response.status}`;
+
+    try {
+      const errorPayload = await response.json();
+      errorMessage = errorPayload?.message || errorPayload?.error || errorPayload?.code || errorMessage;
+    } catch {
+      // Ignore JSON parsing failures and keep the default error message.
+    }
+
+    const error = new Error(errorMessage);
+    error.statusCode = response.status;
+    error.code = response.status === 429 ? "RATE_LIMIT_EXCEEDED" : "UPSTREAM_ERROR";
+    error.provider = provider.name;
+    throw error;
+  }
+
+  const data = await response.json();
+  return normalizeProviderResponse(provider.name, data);
+};
+
+const createNewsHandler = () => async (req, res) => {
+  const providers = getConfiguredProviders();
+
+  if (providers.length === 0) {
+    return res.status(500).json({
+      message: "Server configuration error",
+      code: "CONFIG_ERROR",
+    });
+  }
+
+  const country = String(req.query.country || "").toLowerCase();
+  const category = String(req.query.category || "").toLowerCase();
+
+  if (!ALLOWED_COUNTRIES.includes(country)) {
+    return res.status(400).json({ message: "Invalid country parameter" });
+  }
+
+  if (!ALLOWED_CATEGORIES.includes(category)) {
+    return res.status(400).json({ message: "Invalid category parameter" });
+  }
+
+  let lastError;
+
+  for (let index = 0; index < providers.length; index += 1) {
+    const provider = providers[index];
+
+    try {
+      const data = await fetchProviderNews(provider, { country, category });
+      return res.status(200).json(data);
+    } catch (error) {
+      lastError = error;
+      const canFallback = error.statusCode === 429 && index < providers.length - 1;
+
+      if (canFallback) {
+        console.warn(`[DEV API] Provider ${provider.name} returned 429, attempting fallback provider.`);
+        continue;
+      }
+
+      break;
+    }
+  }
+
+  return res.status(lastError?.statusCode || 500).json({
+    message: lastError?.message || "An unexpected error occurred",
+    code: lastError?.code || "INTERNAL_ERROR",
+    provider: lastError?.provider,
+  });
+};
 
 module.exports = merge(common, {
   mode: "development",
@@ -63,7 +188,8 @@ module.exports = merge(common, {
       if (!devServer) {
         throw new Error("webpack-dev-server is not defined");
       }
-      devServer.app.use("/api", apiProxy);
+
+      devServer.app.get("/api/news", createNewsHandler());
     },
   },
 });
